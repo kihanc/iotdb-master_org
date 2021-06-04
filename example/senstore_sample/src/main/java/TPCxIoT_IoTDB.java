@@ -9,6 +9,8 @@ import org.apache.iotdb.db.qp.physical.crud.InsertRowPlan;
 import org.apache.iotdb.db.qp.physical.crud.RawDataQueryPlan;
 import org.apache.iotdb.db.qp.physical.sys.CreateTimeSeriesPlan;
 import org.apache.iotdb.db.qp.physical.sys.DeleteTimeSeriesPlan;
+import org.apache.iotdb.db.query.context.QueryContext;
+import org.apache.iotdb.db.query.control.QueryResourceManager;
 import org.apache.iotdb.db.service.IoTDB;
 import org.apache.iotdb.tsfile.exception.filter.QueryFilterOptimizationException;
 import org.apache.iotdb.tsfile.file.metadata.enums.CompressionType;
@@ -302,8 +304,8 @@ public class TPCxIoT_IoTDB extends Thread {
                     + beginTime
                     + " and time < "
                     + endTime);
-
-    QueryDataSet resultDataSet = planExecutor.processQuery(queryPlan, null);
+    QueryContext context = new QueryContext(QueryResourceManager.getInstance().assignQueryId(true, 1024, -1));
+    QueryDataSet resultDataSet = planExecutor.processQuery(queryPlan, context);
     int cnt = 0;
     while (resultDataSet.hasNext()) {
       RowRecord rr = resultDataSet.next();
