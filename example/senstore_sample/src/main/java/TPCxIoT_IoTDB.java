@@ -220,6 +220,7 @@ public class TPCxIoT_IoTDB extends Thread {
   public TPCxIoT_IoTDB() {}
 
   private static PlanExecutor planExecutor;
+  private static Planner processor;
 
   static {
     IoTDB.metaManager.init();
@@ -264,6 +265,7 @@ public class TPCxIoT_IoTDB extends Thread {
           randomTimestamp = oldTimestamp + (r * (scanTimestamp - 10000L - oldTimestamp));
 
           result2 = scanHelper(deviceId, sensor, randomTimestamp);
+          System.out.println("result size1 = " + result1.size() + ", result size2 = " + result2.size());
 
         } else {
           String[] measurment = new String[] {sensor};
@@ -292,7 +294,6 @@ public class TPCxIoT_IoTDB extends Thread {
     beginTime = scanTimestamp;
     endTime = beginTime + 5000L;
 
-    Planner processor = new Planner();
     RawDataQueryPlan queryPlan =
         (RawDataQueryPlan)
             processor.parseSQLToPhysicalPlan(
@@ -326,6 +327,7 @@ public class TPCxIoT_IoTDB extends Thread {
 
     try {
       planExecutor = new PlanExecutor();
+      processor  = new Planner();
     } catch (QueryProcessException e) {
       e.printStackTrace();
     }
