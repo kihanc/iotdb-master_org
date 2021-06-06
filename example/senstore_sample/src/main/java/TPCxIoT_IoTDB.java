@@ -1,7 +1,6 @@
 import org.apache.iotdb.db.exception.StorageEngineException;
 import org.apache.iotdb.db.exception.metadata.MetadataException;
 import org.apache.iotdb.db.exception.query.QueryProcessException;
-import org.apache.iotdb.db.metadata.MManager;
 import org.apache.iotdb.db.metadata.PartialPath;
 import org.apache.iotdb.db.qp.Planner;
 import org.apache.iotdb.db.qp.executor.PlanExecutor;
@@ -240,7 +239,6 @@ public class TPCxIoT_IoTDB extends Thread {
     ArrayList<Boolean> generator = new ArrayList<Boolean>();
     String[] insertValue = new String[] {new String(tempBytes)};
 
-
     try {
       PartialPath deviceIdPath = new PartialPath(deviceId);
       long startTime = System.currentTimeMillis();
@@ -265,7 +263,8 @@ public class TPCxIoT_IoTDB extends Thread {
           randomTimestamp = oldTimestamp + (r * (scanTimestamp - 10000L - oldTimestamp));
 
           result2 = scanHelper(deviceId, sensor, randomTimestamp);
-          System.out.println("result size1 = " + result1.size() + ", result size2 = " + result2.size());
+          System.out.println(
+              "result size1 = " + result1.size() + ", result size2 = " + result2.size());
 
         } else {
           String[] measurment = new String[] {sensor};
@@ -305,7 +304,8 @@ public class TPCxIoT_IoTDB extends Thread {
                     + beginTime
                     + " and time < "
                     + endTime);
-    QueryContext context = new QueryContext(QueryResourceManager.getInstance().assignQueryId(true, 1024, -1));
+    QueryContext context =
+        new QueryContext(QueryResourceManager.getInstance().assignQueryId(true, 1024, -1));
     QueryDataSet resultDataSet = planExecutor.processQuery(queryPlan, context);
     int cnt = 0;
     while (resultDataSet.hasNext()) {
@@ -327,7 +327,7 @@ public class TPCxIoT_IoTDB extends Thread {
 
     try {
       planExecutor = new PlanExecutor();
-      processor  = new Planner();
+      processor = new Planner();
     } catch (QueryProcessException e) {
       e.printStackTrace();
     }
@@ -342,9 +342,8 @@ public class TPCxIoT_IoTDB extends Thread {
     System.out.println("Threads: " + threadNum + " ,InsertCount: " + totalNum);
     CompressionType compressionType = CompressionType.UNCOMPRESSED;
 
-
     for (int i = 1; i <= threadNum; i++) {
-      String deviceId = "root.d" + i;
+      String deviceId = "root.sg1.d" + i;
       for (String sensor : sensorKeys) {
         try {
           List<PartialPath> pp = new ArrayList<>();
@@ -352,16 +351,15 @@ public class TPCxIoT_IoTDB extends Thread {
           planExecutor.processNonQuery(new DeleteTimeSeriesPlan(pp));
 
           planExecutor.processNonQuery(
-                  new CreateTimeSeriesPlan(
-                          new PartialPath(deviceId + "." + sensor),
-                          TSDataType.valueOf("TEXT"),
-                          TSEncoding.valueOf("PLAIN"),
-                          compressionType,
-                          null,
-                          Collections.emptyMap(), Collections.emptyMap(),
-                          null
-                  )
-          );
+              new CreateTimeSeriesPlan(
+                  new PartialPath(deviceId + "." + sensor),
+                  TSDataType.valueOf("TEXT"),
+                  TSEncoding.valueOf("PLAIN"),
+                  compressionType,
+                  null,
+                  Collections.emptyMap(),
+                  Collections.emptyMap(),
+                  null));
         } catch (Exception e) {
           // ignore
         }
